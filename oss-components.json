@@ -1,0 +1,29 @@
+{
+  "project": "oss-test",
+  "components": [
+    {
+      "type": "JAVA",
+      "groupID": "org.apache.commons",
+      "artifactID": "commons-lang3",
+      "version": "3.12.0",
+      "svmID": 123,
+      "sources": "https://github.com/apache/commons-lang/archive/refs/tags/rel/commons-lang-3.12.0.zip"
+    },
+    {
+      "type": "JAVA",
+      "groupID": "org.springframework",
+      "artifactID": "spring-core",
+      "version": "5.3.6",
+      "svmID": 234,
+      "sources": "https://github.com/spring-projects/spring-framework/archive/refs/tags/v5.3.6.zip"
+    },
+    {
+      "type": "JAVA",
+      "groupID": "org.springframework",
+      "artifactID": "spring-jms",
+      "version": "5.3.6",
+      "svmID": 234,
+      "sources": "https://github.com/spring-projects/spring-framework/archive/refs/tags/v5.3.6.zip"
+    }
+  ]
+}
