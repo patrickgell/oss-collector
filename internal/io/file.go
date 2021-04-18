@@ -13,12 +13,12 @@ import (
 	"strings"
 )
 
-func ReadJsonFile(filename string) *model.Project {
+func ReadJsonFile(filename *string) *model.Project {
 	// Open our jsonFile
-	jsonFile, err := os.Open(filename)
+	jsonFile, err := os.Open(*filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Fatalf("Could not find file %s: %v", filename, err)
+		log.Fatalf("Could not find file %s: %v", *filename, err)
 	}
 
 	fmt.Println("Successfully Opened users.json")
@@ -33,7 +33,7 @@ func ReadJsonFile(filename string) *model.Project {
 	// read our opened xmlFile as a byte array.
 	byteValue, err := ioutil.ReadAll(jsonFile)
 	if err != nil {
-		log.Fatalf("Could not read the file %s: %v", filename, err)
+		log.Fatalf("Could not read the file %s: %v", *filename, err)
 	}
 
 	// we initialize our Users array
