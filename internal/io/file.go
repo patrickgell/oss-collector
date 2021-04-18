@@ -23,7 +23,12 @@ func ReadJsonFile(filename string) *model.Project {
 
 	fmt.Println("Successfully Opened users.json")
 	// defer the closing of our jsonFile so that we can parse it later on
-	defer jsonFile.Close()
+	defer func(jsonFile *os.File) {
+		err := jsonFile.Close()
+		if err != nil {
+			log.Fatalf("close file did not work %v", err)
+		}
+	}(jsonFile)
 
 	// read our opened xmlFile as a byte array.
 	byteValue, err := ioutil.ReadAll(jsonFile)
@@ -56,7 +61,10 @@ func Unzip(src, dest string) error {
 		}
 	}()
 
-	os.MkdirAll(dest, 0755)
+	err = os.MkdirAll(dest, 0755)
+	if err != nil {
+		return err
+	}
 
 	// Closure to address file descriptors issue with all the deferred .Close() methods
 	extractAndWriteFile := func(f *zip.File) error {
@@ -78,9 +86,15 @@ func Unzip(src, dest string) error {
 		}
 
 		if f.FileInfo().IsDir() {
-			os.MkdirAll(path, f.Mode())
+			err := os.MkdirAll(path, f.Mode())
+			if err != nil {
+				return err
+			}
 		} else {
-			os.MkdirAll(filepath.Dir(path), f.Mode())
+			err := os.MkdirAll(filepath.Dir(path), f.Mode())
+			if err != nil {
+				return err
+			}
 			f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 			if err != nil {
 				return err
@@ -115,10 +129,20 @@ func CreateZip(sourcesPath string, outputFile string) {
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Fatalf("error during close: %v", err)
+		}
+	}(file)
 
 	w := zip.NewWriter(file)
-	defer w.Close()
+	defer func(w *zip.Writer) {
+		err := w.Close()
+		if err != nil {
+			log.Fatalf("error during close: %v", err)
+		}
+	}(w)
 
 	walker := func(path string, info os.FileInfo, err error) error {
 		fmt.Printf("Crawling: %#v\n", path)
@@ -132,7 +156,12 @@ func CreateZip(sourcesPath string, outputFile string) {
 		if err != nil {
 			return err
 		}
-		defer file.Close()
+		defer func(file *os.File) {
+			err := file.Close()
+			if err != nil {
+				log.Fatalf("error during close: %v", err)
+			}
+		}(file)
 
 		// Ensure that `path` is not absolute; it should not start with "/".
 		// This snippet happens to work because I don't use

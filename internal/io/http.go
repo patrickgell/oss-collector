@@ -15,7 +15,10 @@ func DownloadSourcesAndCreateBigZIP(project *model.Project) {
 	for _, component := range components {
 		filename := downloadUrl(&component)
 		if len(filename) > 0 {
-			Unzip(filename, "sources/")
+			err := Unzip(filename, "sources/")
+			if err != nil {
+				log.Fatalf("could not unzip file %s: %v", filename, err)
+			}
 		}
 	}
 	CreateZip("sources/", project.Name+".zip")
@@ -35,13 +38,23 @@ func downloadUrl(component *model.Components) string {
 	if err != nil {
 		log.Fatalf("Error while creating %s: %v", fileName, err)
 	}
-	defer output.Close()
+	defer func(output *os.File) {
+		err := output.Close()
+		if err != nil {
+			log.Fatalf("error during close: %v", err)
+		}
+	}(output)
 
 	response, err := http.Get(component.SourcesURL)
 	if err != nil {
 		log.Fatalf("Error while downloading %s - %v", component.SourcesURL, err)
 	}
-	defer response.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Fatalf("error during close: %v", err)
+		}
+	}(response.Body)
 
 	n, err := io.Copy(output, response.Body)
 	if err != nil {
