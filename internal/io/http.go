@@ -32,7 +32,7 @@ func downloadUrl(component *model.Components) string {
 	exist := exists(fileName)
 	if exist == true {
 		log.Printf("file %s already exists - skipping\n", fileName)
-		return fileName
+		return ""
 	}
 	output, err := os.Create(fileName)
 	if err != nil {
